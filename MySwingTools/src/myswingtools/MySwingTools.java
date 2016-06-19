@@ -15,7 +15,14 @@ public class MySwingTools {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        String aux = "1234";
+        String aux2 = "aaaa";
+        
+        aux2 = (aux2 == null)? "asda":aux2;
+        
+        System.out.println("myswingtools.MySwingTools.main() " + aux2);
+        
+        
     }
     
 }
