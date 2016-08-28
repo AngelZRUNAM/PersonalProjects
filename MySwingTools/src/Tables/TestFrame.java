@@ -30,7 +30,7 @@ public class TestFrame extends javax.swing.JFrame {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                c.setBackground(column == 0 ? Color.LIGHT_GRAY : Color.WHITE);
+                c.setBackground(column == 0 ? Color.LIGHT_GRAY : Color.WHITE);    
                 return c;
             }
         });
