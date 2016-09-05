@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module ConvertidorBinario</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>ConvertidorBinario</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Caluca%5Cgoogle%20drive%5Cgithub%5Cpersonalprojects%5Cnewpythonproject%5Csrc%5Cconvertidorbinario.py">c:\users\aluca\google drive\github\personalprojects\newpythonproject\src\convertidorbinario.py</a></font></td></tr></table>
+    <p><tt>Nombre&nbsp;del&nbsp;Programa&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;Convertidor&nbsp;Decimal&nbsp;-&nbsp;Binario<br>
+Fecha&nbsp;de&nbsp;Creación&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;28/08/2016<br>
+Autor(s)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;Garcia&nbsp;Xoconostle&nbsp;Ivan&nbsp;Rafael<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;Zuñiga&nbsp;Reyes&nbsp;Miguel&nbsp;Angel<br>
+Descripción&nbsp;general&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;Programa&nbsp;con&nbsp;funciones&nbsp;para&nbsp;realizar&nbsp;las&nbsp;conversiones&nbsp;siguientes:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Decimal&nbsp;-&nbsp;Base&nbsp;N&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(dcmlToBaseN)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Decimal&nbsp;-&nbsp;Complemento&nbsp;1&nbsp;(decToC1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Decimal&nbsp;-&nbsp;Complemento&nbsp;2&nbsp;(decToC2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Binario&nbsp;-&nbsp;Decimal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(baseNToDec)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Complemento&nbsp;1&nbsp;-&nbsp;Decimal&nbsp;(c1ToDec)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Complemento&nbsp;2&nbsp;-&nbsp;Decimal&nbsp;(c2ToDec</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-baseNToDec"><strong>baseNToDec</strong></a>(textBin, base, exp)</dt></dl>
+ <dl><dt><a name="-c1ToDec"><strong>c1ToDec</strong></a>(textC1)</dt></dl>
+ <dl><dt><a name="-c2ToDec"><strong>c2ToDec</strong></a>(textC2)</dt></dl>
+ <dl><dt><a name="-dcmlToBaseN"><strong>dcmlToBaseN</strong></a>(number, base)</dt><dd><tt>Método&nbsp;recursivo&nbsp;para&nbsp;convertir&nbsp;un&nbsp;número&nbsp;base&nbsp;10&nbsp;N&nbsp;a&nbsp;una&nbsp;base&nbsp;B<br>
+:parameter&nbsp;number:&nbsp;&nbsp;Número&nbsp;en&nbsp;base&nbsp;10&nbsp;a&nbsp;convertir<br>
+:parameter&nbsp;base:&nbsp;&nbsp;&nbsp;&nbsp;Base&nbsp;a&nbsp;la&nbsp;cual&nbsp;se&nbsp;va&nbsp;a&nbsp;convertir&nbsp;el&nbsp;número&nbsp;decimal.<br>
+:return:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Número&nbsp;N&nbsp;en&nbsp;base&nbsp;B<br>
+Ejemplo:&nbsp;number&nbsp;=&nbsp;10,&nbsp;base&nbsp;=&nbsp;2<br>
+-&gt;&nbsp;<a href="#-dcmlToBaseN">dcmlToBaseN</a>(10/2,2)&nbsp;+&nbsp;"0"&nbsp;<br>
+-&gt;&nbsp;<a href="#-dcmlToBaseN">dcmlToBaseN</a>(5/2,2)&nbsp;+&nbsp;"10"&nbsp;<br>
+-&gt;&nbsp;<a href="#-dcmlToBaseN">dcmlToBaseN</a>(2/2,2)&nbsp;+&nbsp;"010"&nbsp;<br>
+-&gt;&nbsp;regresa&nbsp;"1010"</tt></dd></dl>
+ <dl><dt><a name="-decToC1"><strong>decToC1</strong></a>(numberToCnvrt, deep)</dt><dd><tt>Método&nbsp;recursivo&nbsp;para&nbsp;convertir&nbsp;un&nbsp;número&nbsp;decimal&nbsp;a&nbsp;su&nbsp;representación&nbsp;Complemento&nbsp;a&nbsp;1&nbsp;en&nbsp;binario<br>
+:parameter&nbsp;:</tt></dd></dl>
+ <dl><dt><a name="-decToC2"><strong>decToC2</strong></a>(numberToCnvrt)</dt></dl>
+ <dl><dt><a name="-decToC2Recursive"><strong>decToC2Recursive</strong></a>(numberToCnvrt, sum)</dt></dl>
+</td></tr></table>
+</body></html>
