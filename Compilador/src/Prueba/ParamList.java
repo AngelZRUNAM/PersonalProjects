@@ -9,11 +9,20 @@ import java.util.ArrayList;
 
 /**
  *
- * @author aluca
+ * @author Miguel A. Zuñiga
  */
 public class ParamList {
+    /**
+     * Lista de código para la definición de los parámetros si estos son expresiones
+     */
     ArrayList<Code> code;
+    /**
+     * Lista de código intermedio para colocar los parámetros, Ejemplo: param x 
+     */
     ArrayList<Code> paramCode;
+    /**
+     * Lista de los tipos de parámetros que se estan utilizando
+     */
     ArrayList<Integer> lista;
 
     public ParamList(ArrayList<Code> code, ArrayList<Code> paramCode, ArrayList<Integer> lista) {
@@ -27,6 +36,4 @@ public class ParamList {
         paramCode = new ArrayList<>();
         lista = new ArrayList<>();
     }
-    
-    
 }

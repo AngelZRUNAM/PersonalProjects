@@ -121,7 +121,7 @@ parameters  : parameters COMA typeVar ID { $$ = SemanticAcc.parameters((Type)$3,
             | { $$ = new ArrayList<Tipo>();};
       
 
-declVar     : declVar typeVar {tipo = (Type)$2;} lista PTOYC { $$ = SemanticAcc.declVar(); }
+declVar     : declVar typeVar {tipo = (Type)$2;} lista PTOYC { $$ = new Object();}
             | {$$ = new Object();};
 
 typeVar     : basic {arrayBase = new Type(((Type)$1).type,((Type)$1).width);} array { $$ = (Type)$3; };

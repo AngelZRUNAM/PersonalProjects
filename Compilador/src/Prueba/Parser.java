@@ -864,7 +864,7 @@ case 51:
 break;
 case 52:
 //#line 116 "parser.y"
-{ yyval.obj = SemanticAcc.chackFunc((Sentencia)val_peek(2).obj, (Sentencia)val_peek(0).obj, funcTipo, (String)val_peek(10).sval ) ;}
+{ yyval.obj = SemanticAcc.checkFunc((Sentencia)val_peek(2).obj, (Sentencia)val_peek(0).obj, funcTipo, (String)val_peek(10).sval ) ;}
 break;
 case 53:
 //#line 117 "parser.y"
@@ -888,7 +888,7 @@ case 57:
 break;
 case 58:
 //#line 124 "parser.y"
-{ yyval.obj = SemanticAcc.declVar(); }
+{ yyval.obj = new Object(); }
 break;
 case 59:
 //#line 125 "parser.y"

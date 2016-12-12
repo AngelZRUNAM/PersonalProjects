@@ -132,8 +132,6 @@ public class Main extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        File f = new File("C:\\Users\\aluca\\Google Drive\\Miguel\\Compilador\\fileTest.txt");
-        jFileChooser1.setSelectedFile(f);
         jFileChooser1.showOpenDialog(this);
         file = jFileChooser1.getSelectedFile();
         jTextArea1.setText("");
@@ -148,8 +146,6 @@ public class Main extends javax.swing.JFrame {
                 while((line=br.readLine())!=null){
                     jTextArea1.setText(jTextArea1.getText() + line +"\n");
                 }
-                
-                
                 
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);

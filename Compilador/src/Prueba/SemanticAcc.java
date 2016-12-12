@@ -5,21 +5,14 @@
  */
 package Prueba;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 /**
  *
- * @author ulises
+ * @author ulises - Miguel A. Zuñiga
  */
 public class SemanticAcc {
     // Instancia al parser
@@ -27,32 +20,65 @@ public class SemanticAcc {
     //Instancia al TextArea donde se escribe la tabla de símbolos ( Elemento visual)
     static JTextArea tablaSim;
     //Objeto para representar la tabla de símbolos.
+    /**
+     * Tabla de símbolos local
+     */
     static ArrayList<Simbolo> tablaSimbolos;
-    static ArrayList<Simbolo> paramTemp;
+    /**
+     * Tabla de símbolo globlal
+     */
     static ArrayList<Simbolo> tablaSimbolosGlobal;
-    
-    static ArrayList<Integer> tablaOffSet;
-    //Objeto para la tabla de tipos
+    /**
+     * Tabla de tipos local
+     */
     static ArrayList<Tipo> tablaTipos;
+    /**
+     * Tabla de tipos global
+     */
     static ArrayList<Tipo> tablaTiposGlobal;
-    
+    /**
+     *Lista de tablas de símbolos locales 
+     */
     static ArrayList<ArrayList<Simbolo>> oldSim;
+    /**
+     * Lista de Nombres de funciones declaradas, sirve para hacer match con la lista de tabla de símbolos
+     */
     static ArrayList<String> funcNames;
+    /**
+     * Lista de tablas de tipos locales
+     */
     static ArrayList<ArrayList<Tipo>> oldTip;
     
-    // Variable para contar las direcciones
+    /** 
+     * Variable para contar las direcciones
+     */
     static int offset;
-    // Variables para llevar la cuenta de las etiquetas, temporales e indices
+    /** 
+     * Variables para llevar la cuenta de las etiquetas, temporales e indices
+     */
     static int numLabel=0;
     static int numTemp = 0;
     static int numIndex = 0;
     
-    
+    /**
+     * Variable para llevar la cuenta de tipos creados. 
+     */
     static int numTipos = 0;
+    /**
+     * Variable para llevar la cuenta de símbolos creados.
+     */
     static int numSimbol = 0;
     
+    /**
+     * Variable para saber si el programa esta en fase de declaraciones globales o locales.
+     */
     static boolean globalLock = false;
     
+    public static File file;
+    
+    /**
+     * Inicializador statico, crea una instancia para todas las listas.
+     */
     static {
         tablaSimbolos   = new ArrayList<>();
         tablaSimbolosGlobal   = new ArrayList<>();
@@ -60,7 +86,6 @@ public class SemanticAcc {
         tablaTiposGlobal      = new ArrayList<>();
         funcNames       = new ArrayList<>();
         funcNames.add("GLOBAL");
-        paramTemp = new ArrayList<>();
         oldSim = new ArrayList<>();
         oldTip = new ArrayList<>();
         initTablaTipo(tablaTipos);
@@ -90,21 +115,6 @@ public class SemanticAcc {
         tablaSimbolos.add(s);
         return temp;
     }
-    
-    /**
-     * Método para buscar en la tabla de símbolos un id
-     * @param id el id a buscar
-     * @return la posición en la tabla de símbolos
-     */
-    private static int search(String id){
-        int i= -1;
-        for(Simbolo sim : tablaSimbolos){
-            if(sim.lexema.equals(id))
-                return i= tablaSimbolos.indexOf(sim);
-        }
-        return i;
-    }
-    
     /**
      * Método para generar etiquetas.
      * @return  La etiqueta nueva generada
@@ -115,51 +125,6 @@ public class SemanticAcc {
         return label;
     }
     
-    
-    /**
-     * Método que imprime el código intermedio 
-     * @param code código intermedio para imprimir
-     */
-    public static void print(ArrayList<Code> code){
-        File yyoutput;
-        BufferedWriter bw;
-        PrintWriter pw = null;
-        try {
-            yyoutput = new File("Salida.ci");
-            
-            pw = new PrintWriter( new FileWriter(yyoutput));
-            
-            for(Code cod : code){
-                switch(cod.code){
-                    case "Label":
-                        System.out.print(cod.indexLabel+":");
-                        pw.print(cod.indexLabel+":");
-                        break;
-                    case "goto":
-                        System.out.println("goto "+cod.indexLabel);
-                        pw.println("goto "+cod.indexLabel);
-                        break;
-                    default:
-                        if(cod.indexLabel.equals("0")){
-                            System.out.println(cod.code);
-                            pw.println(cod.code);
-                        }else{
-                            System.out.println(cod.code+" "+cod.indexLabel);
-                            pw.println(cod.code+" "+cod.indexLabel);
-                        }
-                }
-            }
-            
-            
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(SemanticAcc.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(SemanticAcc.class.getName()).log(Level.SEVERE, null, ex);
-        }finally{
-            pw.close();
-        }
-    }
-    
     /**
      * Mérodo para unificar etiquetas
      * @param code representa el código donde se van a combinar las etiquetas
@@ -168,9 +133,6 @@ public class SemanticAcc {
      */
     static void combinar(ArrayList<Code> code, String first, String second){
         for(Code code0 : code){
-//            if(code0.indexLabel.equals(second)){
-//                code0.indexLabel = first;
-//            }
             if(code0.code.contains(first))
                 code0.code = code0.code.replace(first, second);
             if(code0.cuad != null)
@@ -188,8 +150,6 @@ public class SemanticAcc {
      */
     static void asignar(ArrayList<Code> code, String index,  String label0){
         for(Code code0: code){
-//            if(code0.indexLabel.equals(index))
-//                code0.indexLabel = label0;
             if(code0.code.contains(index))
                 code0.code = code0.code.replace(index, label0);
             if(code0.cuad != null)
@@ -207,357 +167,16 @@ public class SemanticAcc {
      */
     public static void init(JTextArea simbolos){
         tablaSim = simbolos;
-        
     }
 
     /**
-     * Método para insertar un símbolo en la tabla de símbolos
-     * @param sval es el identificador a insertar
-     * @param tipo es el tipo del id
+     * Agrega un nuevo símbolo a la tabla de símbolo global si es una variable global o una función 
+     * en caso contrario lo agrega a la tabla de símbolo local en turno.
+     * 
+     * @param sval String con el lexema del símbolo
+     * @param tipo Type con el tipo de símbolo
+     * @param parFunc int que indica si el símbolo es variable (0), parámetro (1) o función (2)
      */
-    static void putId(String sval, int tipo) {
-        if(tablaSimbolos.indexOf(sval)==-1){
-            tablaSimbolos.add(new Simbolo(sval, offset, tipo));
-            int width = (tablaTipos.get(tipo)).width;
-            offset += width;
-            tablaSim.setText(tablaSim.getText()+
-                    tablaSimbolos.get(tablaSimbolos.size()-1).toString()+"\n");
-        }else{
-            yyparser.yyerror("Error el id se ha declarado mas de una vez");
-        }
-    }
-
-    /**
-     * Ss-> S Ss1 
-     * Genera el código intermedio para una sentencia
-     * @param sentencia representa a S
-     * @param sentencia0 representa a Ss1
-     * @return el valor que va tomar Ss
-     */
-    static Sentencia Sent(Sentencia sentencia, Sentencia sentencia0) {
-        Sentencia sent = new Sentencia(sentencia0.next, new ArrayList());
-        sent.code.addAll(sentencia.code);
-        sent.code.add(new Code("Label", sentencia.next));
-        sent.code.addAll(sentencia0.code);   
-        asignar(sent.code,sentencia.next,newLabel());
-        return sent;
-    }
-
-    /**
-     * L-> S
-     * @param sentencia representa a S
-     * @return el valor para L
-     */
-    static Sentencia Sent(Sentencia sentencia) {
-        Sentencia sent = new Sentencia(newLabel(), new ArrayList());
-        sent.code.addAll(sentencia.code);
-        return sent;
-    }
-
-    /** 
-     * S -> if(B) S1
-     * @param aBool ojeto que representa a B
-     * @param sentencia objeto que reprsenta a S1
-     * @return objeto que representa a S
-     */
-    static Sentencia If(Bool aBool, Sentencia sentencia) {
-        Sentencia sent = new Sentencia(aBool.lfalse, new ArrayList());
-        sent.code.addAll(aBool.code);
-        sent.code.add(new Code("Label", aBool.ltrue));
-        sent.code.addAll(sentencia.code);
-        
-        combinar(sent.code, aBool.lfalse, sentencia.next);
-        asignar(sent.code, aBool.ltrue, newLabel());
-        
-//        System.out.println("Generando código para if");
-//        for(Code cod: sent.code){
-//            switch(cod.code){
-//                case "Label":
-//                    System.out.print(cod.indexLabel+":");
-//                    break;
-//                case "goto":
-//                    System.out.println("goto "+cod.indexLabel);
-//                    break;
-//                default:
-//                    if(cod.indexLabel.equals("0")){
-//                        System.out.println(cod.code);
-//                    }else
-//                        System.out.println(cod.code+" "+cod.indexLabel);
-//            }
-//        }
-//        System.out.println("Terminando código if");
-        return sent;
-    }
-
-    /**
-     * S-> if( B ) S1 else S2
-     * @param aBool representa a B
-     * @param sentencia representa a  S1
-     * @param sentencia0 representa a S2
-     * @return  rerpesenta a S
-     */
-    static Sentencia IfElse(Bool aBool, Sentencia sentencia, Sentencia sentencia0) {
-        Sentencia sent = new Sentencia(sentencia.next, new ArrayList());
-        sent.code.addAll(aBool.code);
-        sent.code.add(new Code("Label", aBool.ltrue));
-        sent.code.addAll(sentencia.code);
-        sent.code.add(new Code("goto", sentencia.next));
-        sent.code.add(new Code("Label", aBool.lfalse));
-        sent.code.addAll(sentencia0.code);
-        
-        combinar(sent.code, sentencia.next, sentencia0.next);
-        asignar(sent.code, aBool.ltrue, newLabel());
-        asignar(sent.code, aBool.lfalse, newLabel());
-        
-        return sent;
-    }
-
-    /**
-     * Lleva a cabo la comparación de los tipos y la generación
-     * de código intermedio para una expresion de suma
-     * E-> E1 + T
-     * @param expresion representa a E1
-     * @param expresion0 representa a T
-     * @return valor que va tomar E
-     */
-    static Expresion Add(Expresion expresion, Expresion expresion0) {
-        Expresion exp = new Expresion();        
-        if(expresion.tipo == expresion0.tipo){
-            exp.dir = newTemp();
-            exp.tipo = expresion.tipo;
-            exp.code=  new ArrayList<Code>();
-            exp.code.addAll(expresion.code);
-            exp.code.addAll(expresion0.code);
-            exp.code.add(new Code(exp.dir+" = "+expresion.dir+" + "+expresion0.dir, "0"));            
-        }else if(expresion.tipo == 0 && expresion0.tipo ==1){
-            exp.tipo = 1;
-            exp.dir = newTemp();
-            exp.code=  new ArrayList<Code>();
-            String alfa = newTemp();
-            exp.code.addAll(expresion.code);
-            exp.code.addAll(expresion0.code);
-            exp.code.add(new Code(alfa+"= intToFloat("+expresion.dir,"0"));
-            exp.code.add(new Code(exp.dir+" = "+alfa +"+"+expresion0.dir, "0"));
-        }else if(expresion.tipo == 1 && expresion0.tipo ==0){
-            exp.tipo = 1;
-            exp.dir = newTemp();
-            exp.code=  new ArrayList<Code>();
-            String alfa = newTemp();
-            exp.code.addAll(expresion.code);
-            exp.code.addAll(expresion0.code);
-            exp.code.add(new Code(alfa+"= intToFloat("+expresion0.dir,"0"));
-            exp.code.add(new Code(exp.dir+" = "+expresion.dir +"+"+alfa, "0"));
-        }else{
-            yyparser.yyerror("Error los tipos no coinciden");
-        }
-        return exp;
-    }
-    
-    /**
-     * Lleva a cabo la comprobación de tipos y genera el código intermedio
-     * para la multiplicación
-     * T->T1 * F
-     * @param expresion rerpesenta a T1
-     * @param expresion0 rerpresenta a F
-     * @return el valor para T
-     */
-    static Object Mul(Expresion expresion, Expresion expresion0) {
-        Expresion exp = null;        
-        if(expresion.tipo == expresion0.tipo){
-            exp = new Expresion(newTemp(),expresion.tipo, new ArrayList());
-            exp.dir = newTemp();
-            exp.tipo = expresion.tipo;
-            exp.code.addAll(expresion.code);
-            exp.code.addAll(expresion0.code);
-            exp.code.add(new Code(exp.dir+" = "+expresion.dir+" * "+expresion0.dir, "0"));            
-        }else if(expresion.tipo == 0 && expresion0.tipo ==1){
-            exp = new Expresion(newTemp(),1, new ArrayList());
-            exp.tipo = 1;
-            exp.dir = newTemp();
-            String alfa = newTemp();
-            exp.code.addAll(expresion.code);
-            exp.code.addAll(expresion0.code);
-            exp.code.add(new Code(alfa+"= intToFloat("+expresion.dir,"0"));
-            exp.code.add(new Code(exp.dir+" = "+alfa +"*"+expresion0.dir, "0"));
-        }else if(expresion.tipo == 1 && expresion0.tipo ==0){
-            exp = new Expresion(newTemp(),1,new ArrayList());
-            exp.tipo = 1;
-            exp.dir = newTemp();
-            String alfa = newTemp();
-            exp.code.addAll(expresion.code);
-            exp.code.addAll(expresion0.code);
-            exp.code.add(new Code(alfa+"= intToFloat("+expresion0.dir,"0"));
-            exp.code.add(new Code(exp.dir+" = "+expresion.dir +"*"+alfa, "0"));
-        }else{
-            yyparser.yyerror("Error los tipos no coinciden");
-        }
-        return exp;
-    }
-
-    
-    /**
-     * Método que genera código intermedio en un archivo de salida
-     * P-> D L
-     * @param sentencia representa a L la lista de sentencias
-     * @return el valor para P
-     */
-    static Sentencia Program(Sentencia sentencia) {
-        Sentencia sent = new Sentencia(sentencia.next, new ArrayList());
-        sent.code.addAll(sentencia.code);
-        sent.code.add(new Code("Label", sent.next));
-        asignar(sent.code, sent.next, newLabel());
-        
-        print(sent.code);
-        
-        return sent;
-        
-    }
-
-    /**
-     * Método para generar código intermedio para la expresión booleana or
-     * B -> B1 || B2
-     * @param aBool  representa a B1
-     * @param aBool0 representa a B2
-     * @return el valor para B
-     */
-    static Object Or(Bool aBool, Bool aBool0) {
-        Bool bool = new Bool(aBool.ltrue,aBool0.lfalse , new ArrayList());
-        bool.code.addAll(aBool.code);
-        bool.code.add(new Code("Label", aBool.lfalse));
-        bool.code.addAll(aBool0.code);
-        combinar(bool.code, aBool.ltrue, aBool0.ltrue);
-        asignar(bool.code, aBool.lfalse, newLabel());
-        return bool;
-    }    
-
-    /**
-     * Método que busca un id en la tabla de símbolos
-     * E -> id
-     * @param id representa el id a buscar
-     * @return el valor para E
-     */
-    static Object getId(String id) {      
-        Expresion exp = null;
-        int i = search(id);
-        //System.out.println(id);
-        //System.out.println(""+i);
-        int tipo;
-        if(i!=-1){
-            Simbolo sim= tablaSimbolos.get(i);
-            tipo = sim.tipo;
-            exp = new Expresion(id, tipo, new ArrayList());
-        }else{
-            yyparser.yyerror("El identificador no ha sido declarado");
-        }
-  
-        
-        return exp;
-    }
-
-    
-    /**
-     * Método que retorna el número
-     * F-> num 
-     * @param number representa a num
-     * @return el valor para F
-     */
-    static Object getNum(Number number) {        
-        Expresion exp;
-        if(number.tipo.equals("int"))
-            exp = new Expresion( number.ival.toString(), 0, new ArrayList());
-        else
-            exp = new Expresion( number.dval.toString(), 1, new ArrayList());
-        return exp;
-    }
-    
-    
-    /**
-     * Método para generar código intermedio para
-     * S-> id opasig E ;
-     * @param id representa al id
-     * @param opasig representa el operador de asignación (=, += ,*=)
-     * @param expresion rerpesenta a E
-     * @return el valor que va tomar S
-     */
-    static Object Asig(String id, String opasig, Expresion expresion) {
-        Sentencia sent = new Sentencia(newIndex(), new ArrayList());
-        int i = search(id);
-        //System.out.println(id);
-        //System.out.println(""+i);
-        if(i!=-1){
-            Simbolo sim = tablaSimbolos.get(i);
-            String temp;
-            if(sim.tipo == expresion.tipo){
-                switch(opasig){
-                    case "=":
-                        sent.code.addAll(expresion.code);
-                        sent.code.add(new Code(id+"="+expresion.dir,"0"));
-                        break;
-                    case "+=":
-                        temp = newTemp();
-                        sent.code.addAll(expresion.code);
-                        sent.code.add(new Code(temp+"="+id+"+"+expresion.dir,"0"));
-                        sent.code.add(new Code(id+"="+temp,"0"));
-                        break;
-                    case "*=":
-                        temp = newTemp();
-                        sent.code.addAll(expresion.code);
-                        sent.code.add(new Code(temp+"="+id+"*"+expresion.dir,"0"));
-                        sent.code.add(new Code(id+"="+temp,"0"));
-                        break;
-                }
-            }else{
-                yyparser.yyerror("Error los tipos no son compatibles");
-            }
-        }else{
-            yyparser.yyerror("Error se esta utilizando un id que no fue declarado ");
-        }
-        return sent;
-    }    
-
-    /**
-     * Método para generar código intermedio para 
-     * B-> B1 && B2
-     * @param bool representa a B1
-     * @param bool0 rerpesenta a B2
-     * @return valor para B
-     */
-    static Object And(Bool bool, Bool bool0) {
-        Bool bool1 = new Bool(bool0.ltrue, bool.lfalse , new ArrayList());
-        bool1.code.addAll(bool.code);
-        bool1.code.add(new Code("Label", bool.ltrue));
-        bool1.code.addAll(bool0.code);
-        combinar(bool1.code, bool.lfalse, bool0.lfalse);
-        asignar(bool1.code, bool.ltrue, newLabel());
-        return bool;
-    }
-
-    /**
-     * B-> E1 oprel E2
-     * @param expresion representa a E1
-     * @param oprel operado relacional ( >, <, ==)
-     * @param expresion0 representa a E2
-     * @return valor que va tomar B
-     */
-    static Object Exp(Expresion expresion, String oprel, Expresion expresion0) {
-        Bool bool = new Bool(newIndex(), newIndex(), new ArrayList());
-        String temp = newTemp();
-        bool.code.addAll(expresion.code);
-        bool.code.addAll(expresion0.code);
-        bool.code.add(new Code(temp+" = "+expresion.dir+" "+oprel+" "+expresion0.dir,"0"));
-        bool.code.add(new Code("if "+temp+" goto ",bool.ltrue));
-        bool.code.add(new Code("goto", bool.lfalse));
-        return bool;
-    }
-
-    static Object Program() {
-        return new Object();
-    }
-
-    static Object declVar() {
-        return new Object();
-    }
-
     static void addID(String sval, Type tipo, int parFunc) {
         
         Simbolo sim = new Simbolo(sval, offset, tipo.type, parFunc, null);
@@ -582,8 +201,14 @@ public class SemanticAcc {
         
     }
     
+    /**
+     * Genera un nuevo tipo para un arreglo y lo inserta en la tabla de tipos.
+     * @param obj1 Object que se castea a Type con el tipo padre del arreglo  
+     * @param obj2 Object que se castea a Number con el valor entero del índice del arreglo
+     * @param base int con la base del nuevo tipo.
+     * @return Type para el arreglo.
+     */
     static Type insertType(Object obj1, Object obj2, int base){
-        //agregar a tabla de tipos 
         Type tipo = new Type(numTipos, ((Type)obj2).width * ((Number)obj1).ival);
         Tipo t = new Tipo(numTipos++, "Aux", tipo.width, ((Type)obj2).type);
         t.base = base;
@@ -592,6 +217,13 @@ public class SemanticAcc {
         return tipo;
     }
 
+    /**
+     * Arreglo para manejar la lista de diferentes sentencias de control.
+     * L = L S
+     * @param obj Sentencia que representa a la lista de control 
+     * @param obj0 Sentencia que representa a una sentencia de control.
+     * @return Sentencia representando la unión de la lista con la sentencia de control.
+     */
     static Sentencia listControl(Sentencia obj, Sentencia obj0) {
         Sentencia s = new Sentencia(obj0.next, new ArrayList<Code>());
         s.code.addAll(obj.code);
@@ -602,6 +234,13 @@ public class SemanticAcc {
         return s;
     }
     
+    /**
+     * Evalua una operacion de suma o resta con dos expresiones generando una expresión como resultado
+     * @param oper1 Expresion del operador 1
+     * @param oper String tipo de operación 
+     * @param oper2 Expresion del operador 2
+     * @return Expresion de la operacion entre los dos operandos.
+     */
     static Expresion sumaresta(Expresion oper1, String oper, Expresion oper2){
         Expresion exp = new Expresion(); 
         Code c ;
@@ -640,7 +279,14 @@ public class SemanticAcc {
         }
        return exp;
     }
-
+    
+    /**
+     * Evalua una operacion de multiplicación, divición o modulo con dos expresiones generando una expresión como resultado
+     * @param oper1 Expresion del operador 1
+     * @param oper String tipo de operación 
+     * @param oper2 Expresion del operador 2
+     * @return Expresion de la operacion entre los dos operandos.
+     */    
     static Expresion muldivmod(Expresion oper1, String oper, Expresion oper2){
         Expresion exp = new Expresion(); 
         if(oper1.base != -1) oper1.tipo = oper1.base;
@@ -678,7 +324,10 @@ public class SemanticAcc {
         //exp.print();
         return exp;
     }
-
+    /**
+     * Inicializador de la tabla de tipos.
+     * @param tablaTipos 
+     */
     private static void initTablaTipo(ArrayList<Tipo> tablaTipos) {
         addTipo( new Tipo(numTipos++, "void",0, -1),tablaTipos);
         addTipo( new Tipo(numTipos++, "char",2, -1),tablaTipos);
@@ -686,12 +335,20 @@ public class SemanticAcc {
         addTipo( new Tipo(numTipos++, "float",8, -1),tablaTipos);
     }
 
+    /**
+     * Agrega un tipo a la tabla de tipos dependiendo si es global o local.
+     * @param tipo Tipo a agregar en la tabla
+     * @param tablaTipos  ArrayList de Tipo representando la tabla de tabla de tipos local
+     */
     private static void addTipo(Tipo tipo,ArrayList<Tipo> tablaTipos) {
         if(globalLock) tablaTipos.add(tipo);
         else
             tablaTiposGlobal.add(tipo);
     }
 
+    /**
+     * Imprime las tablas de símbolos en la salida estandar
+     */
     static void print() {
         int i= 0;
         nuevoEntorno();
@@ -717,24 +374,31 @@ public class SemanticAcc {
         
     }
 
+    /**
+     * Obtiene la posición en la tabla de tipos (global o local) de un tipo según su identificador
+     * @param value String con el lexema del identificador a buscar
+     * @return int con la posición en la tabla de tipos, -1 si no existe el símbolo.
+     */    
     static int getTypeFromID(String value) {
-
         for (Simbolo simbolos : tablaSimbolos) {
             if(value.equals(simbolos.lexema))
                 return simbolos.tipo;
         }
-        
         for (Simbolo simbolos : tablaSimbolosGlobal) {
             if(value.equals(simbolos.lexema))
                 return simbolos.tipo;
         }
-        
-        
         return -1;
     }
     
     
-
+    /**
+     * Ar -> id[num]
+     * Obtiene el valor de un arreglo como un Expresion
+     * @param string String identificador del arreglo
+     * @param expresion Numero con el valor del arreglo.
+     * @return Expresion con el valor del arreglo 
+     */
     static Expresion arrayValue(String string, Expresion expresion) {
         int t = getTypeFromID(string);
         if( t == -1 ) {
@@ -751,7 +415,13 @@ public class SemanticAcc {
         exp.code.add(new Code(exp.dir + " = " + expresion.dir + " * " + exp.width ,"*",expresion.dir,exp.width+"",exp.dir));
         return exp;
     }
-
+    /**
+     * Ar -> Ar [num]
+     * Encadena el valor de un arreglo de multiples dimensiones.
+     * @param arrayValue Expresion de la cadena para las dimensiones del arreglo.
+     * @param expresion Expresion con el numero del indice para el arreglo.
+     * @return Expresion con la cadena + la dimension del arreglo en turno
+     */
     static Expresion arrayValue(Expresion arrayValue, Expresion expresion) {
         if(expresion.tipo != 2) yyparser.yyerror("Error: indice debe ser entero " );
         Expresion exp = new Expresion();
@@ -766,7 +436,11 @@ public class SemanticAcc {
         exp.code.add(new Code(exp.dir + " = " + arrayValue.dir + " + " + temp,"+",arrayValue.dir,temp,exp.dir));
         return exp;
     }
-
+    /**
+     * Obtiene el Tipo de la tabla de tipos local o global 
+     * @param t int con la posición en la tabla de tipos del tipo que se requiere
+     * @return Tipo requerido de la tabla local o global de tipos, null si no se encuentra un tipo adecuado.
+     */
     private static Tipo getType(int t) {
         for (Tipo tipo : tablaTipos) {
             if(tipo.pos == t) return tipo;
@@ -777,6 +451,13 @@ public class SemanticAcc {
         return null;
     }
 
+    /**
+     * S -> return E
+     * Realiza el codigo intermedio para la sentencia de control de return E;
+     * @param expresion Expresion que representa el valor de retorno
+     * @param funcType Type representa el tipo de la función
+     * @return Sentencia con el codigo y la bandera de retorno encendida
+     */
     static Sentencia controlReturn(Expresion expresion, Type funcType) {
         Sentencia s = new Sentencia(newLabel(), new ArrayList<Code>());
         int base = funcType.type;
@@ -791,6 +472,14 @@ public class SemanticAcc {
         return s;
     }
 
+    /**
+     * S -> id Oasig E 
+     * Agrega el codigo intermedio para la sentencia de asignacion dependiendo del tipo de asignador.
+     * @param id String con el identificador de la variable en donde se va a realizar la asignación
+     * @param oper String con el valor del operador de asignación
+     * @param expresion Expresion con el valor a asignar
+     * @return Sentencia con el codigo intermedio de la asignación.
+     */    
     static Sentencia controlAsig(String id, String oper, Expresion expresion) {
         Sentencia s = new Sentencia(newLabel(), new ArrayList<Code>());
         Simbolo l = getSimboloFromID(id);
@@ -809,6 +498,11 @@ public class SemanticAcc {
         return s;
     }
 
+    /**
+     * Obtiene un símbolo de la tabla de simbolos segun su lexema
+     * @param value String con el lexema del símbolo a obtener.
+     * @return Simbolo requerido o null en caso de que no exista. 
+     */
     public static Simbolo getSimboloFromID(String value) {
          for (Simbolo simbolos : tablaSimbolos) {
             if(value.equals(simbolos.lexema))
@@ -821,6 +515,14 @@ public class SemanticAcc {
         return null;
     }
     
+    /**
+     * Procesa la evaluacion de operadores relacionelas entre expresiones para generar un valor booleano
+     * B -> E Or E 
+     * @param exp1 Expresion operando 1
+     * @param oper String con el operador relacional 
+     * @param exp2 Expresion operando 2
+     * @return Bool valor de la operacion entre operandos.
+     */
     public static Bool boolValue(Expresion exp1, String oper, Expresion exp2 ){ 
         Bool b = new Bool(newIndex(), newIndex(), new ArrayList());
         b.code.addAll(exp1.code);
@@ -837,12 +539,25 @@ public class SemanticAcc {
         b.code.add(c3);
         return b;
     }  
-
+    
+    /**
+     * Procesa la operacion de negación a un valor booleano
+     * B -> !B
+     * @param bool Bool operando
+     * @return Bool resultado de la negación del operando.
+     */
     static Bool boolValueNot(Bool bool) {
         Bool b = new Bool(bool.lfalse, bool.ltrue, bool.code);
         return b;
     }
-
+    
+    /**
+     * Procesa la operación OR de dos operandos Booleanos
+     * B -> B || B
+     * @param b1 Bool operando 1
+     * @param b2 Bool operando 2
+     * @return Bool resultado de la opración OR 
+     */
     static Bool boolValueOR(Bool b1, Bool b2) {
         Bool b = new Bool(b2.ltrue,b2.lfalse,new ArrayList());
         b.code.addAll(b1.code);
@@ -854,7 +569,13 @@ public class SemanticAcc {
         return b;
     }
 
-
+    /**
+     * Procesa la operación AND de dos operandos booleanos 
+     * B -> B && B
+     * @param b1 Bool operando 1
+     * @param b2 Bool operando 2
+     * @return Bool resultado de la operación 
+     */
     static Bool boolValueAND(Bool b1, Bool b2) {
         Bool b = new Bool(b2.ltrue,b1.lfalse,new ArrayList());
         b.code.addAll(b1.code);
@@ -865,7 +586,14 @@ public class SemanticAcc {
         asignar(b.code, b1.ltrue, newLabel());
         return b;
     }
-
+    
+    /**
+     * Procesa la sentencia de control IF 
+     * S -> if ( B ) S
+     * @param bool Bool para la condicional de la estructura IF
+     * @param sentencia Sentencia en caso de la condicional sea afirmativa
+     * @return Sentencia con el codigo intermedio de la estructura IF
+     */
     static Sentencia controIF(Bool bool, Sentencia sentencia) {
         Sentencia s = new Sentencia();
         s.next = bool.lfalse;
@@ -877,7 +605,15 @@ public class SemanticAcc {
         asignar(s.code,bool.ltrue,newLabel());
         return s;
     }
-
+    
+    /**
+     * Procesa la sentencia de control IF ELSE
+     * S -> if ( B ) S else S
+     * @param bool Bool condición a evaluar
+     * @param s1 Sentencia codigo a ejecutar en caso positivo 
+     * @param s2 Sentencia codigo a ejecutar en caso negativo
+     * @return Sentencia codigo de la estructura IF ELSE
+     */
     static Sentencia controlIFEl(Bool bool, Sentencia s1, Sentencia s2) {
         Sentencia s = new Sentencia();
         s.next = s1.next;
@@ -893,7 +629,14 @@ public class SemanticAcc {
         asignar(s.code, bool.lfalse, newLabel());
         return s;
     }
-
+    
+    /**
+     * Procesa la sentencia de control WHILE
+     * S -> while ( B ) S
+     * @param bool Bool condición a evaluar 
+     * @param sentencia Sentencia codigo a ejecutar en el loop
+     * @return Sentencia codigo intermedio de la sentencia WHILE
+     */
     static Sentencia controlWhile(Bool bool, Sentencia sentencia) {
         Sentencia s = new Sentencia();
         s.next = bool.lfalse;
@@ -908,6 +651,13 @@ public class SemanticAcc {
         return s;
     }
 
+    /**
+     * Procesa la sentencia de control DO WHILE
+     * S -> do S while( B ) ; 
+     * @param sent Sentencia codigo a ejecutar en loop 
+     * @param b Bool condición de repetición del loop
+     * @return Sentencia con el código de DO WHILE
+     */
     static Sentencia controlDO(Sentencia sent, Bool b) {
         Sentencia s = new Sentencia();
         s.code = new ArrayList<>();
@@ -921,6 +671,15 @@ public class SemanticAcc {
         return s;
     }
 
+    /**
+     * Procesa la sentencia de control FOR 
+     * S -> for ( As ; B ; I ) S
+     * @param decl Sentencia código de la asignación 
+     * @param b Bool condición a evaluar 
+     * @param incr Code código del incremento
+     * @param sent Sentencia código a ejecutar en el loop
+     * @return Sentencia código de la sentencia de control FOR
+     */
     static Sentencia controlFor(Sentencia decl, Bool b, Code incr, Sentencia sent) {
         Sentencia s = new Sentencia();
         s.code = new ArrayList<>();
@@ -936,7 +695,14 @@ public class SemanticAcc {
         asignar(s.code,b.ltrue,newLabel());
         return s;
     }
-
+    
+    /**
+     * Realiza el código de incremento de una variable.
+     * I -> id ( ++ | -- )
+     * @param id String lexema de la variable a incrementar.
+     * @param oper String con el tipo de operador, + para incrementar, - para decrementar.
+     * @return Code código intermedio del incremento.
+     */
     static Code increment(String id, String oper) {
         int type = getTypeFromID(id);
         if( type == -1 ) throw new Error("Error: identificador no existe");
@@ -946,7 +712,15 @@ public class SemanticAcc {
         c.cuad = new Cuadruple(oper, id, "1", id);
         return c;
     }
-
+    
+    /**
+     * Realiza la inserción de una función en la tabla de símbolos local y global
+     * 
+     * @param tipo Type representando el tipo de retorno de la función
+     * @param id String con el lexema de la función
+     * @param params Lista de Tipo's de los parámetros de la función
+     * @return Type con el tipo de la función
+     */
     static Type setFuncType(Type tipo, String id, ArrayList<Tipo> params) {
         Simbolo func = new Simbolo(id, offset, tipo.type, 2, params);
         offset = offset + tipo.width;
@@ -956,20 +730,41 @@ public class SemanticAcc {
         globalLock = true;
         return tipo;
     }
-
+    
+    /**
+     * Realiza la inserción en la tabla de símbolos de los parámetros de una función
+     * Lp -> T id
+     * @param type Type tipo del parámetro
+     * @param id String lexema del parámetro
+     * @return Lista de Tipo's con el parametro que se agregó. 
+     */
     static ArrayList<Tipo> parameters(Type type, String id) {
         addID(id, type,1);
         ArrayList<Tipo> params = new ArrayList<>();
         params.add(getType(getTypeFromID(id)));
         return params;
     }
-
+    
+    /**
+     * Realiza la inserción y el encadenamiento de los parámetros de una función.
+     * Lp -> Lp, T id
+     * @param type Type tipo del parámetro a insertar
+     * @param id String lexema del parámetro
+     * @param params Lista de Tipo's con los tipos de los parámetros previos
+     * @return Lista de Tipo's previos mas el el Tipo del parámetro recien insertado.
+     */
     static ArrayList<Tipo> parameters(Type type, String id, ArrayList<Tipo> params) {
         addID(id,type,1);
         params.add(getType(getTypeFromID(id)));
         return params;
     }
-
+    
+    /**
+     * Realiza una comparación entre dos tipos decidiendo si son compatibles o no.
+     * @param t1 int tipo 1
+     * @param t2 int tipo 2
+     * @return true si los tipos son compatibles, false en caso contrario. 
+     */
     private static boolean compatible(int t1, int t2) {
         switch(t1){
             case 2:
@@ -981,6 +776,11 @@ public class SemanticAcc {
         return false;
     }
 
+    /**
+     * Obtiene el Tipo de la tabla de Tipos dependiendo de la posición.
+     * @param type int con la posición de tipo 
+     * @return Tipo requerido
+     */
     private static Tipo getTypeFromPos(int type) {
         for (Tipo tipo : tablaTipos) {
             if(tipo.pos == type) return tipo;
@@ -990,8 +790,17 @@ public class SemanticAcc {
         }
         return null;
     }
-
-    static Sentencia chackFunc(Sentencia sents, Sentencia funcs, Type tipo,String id) {
+    
+    /**
+     * Procesa la declaración de una función y las funciones previamente definidas
+     * S -> define T ID ( Lp ) { D S }
+     * @param sents Sentencia código de las sentencias de control 
+     * @param funcs Sentencia código de las funciones definidas.
+     * @param tipo Type de la función a procesar
+     * @param id String Lexema de la función a procesar
+     * @return Sentencia código de la función a procesar y las previamente procesadas.
+     */
+    static Sentencia checkFunc(Sentencia sents, Sentencia funcs, Type tipo,String id) {
         if( !sents.ret ) throw new Error("Error: falta valor de return");
         Sentencia s = new Sentencia();
         s.code = new ArrayList<>();
@@ -1006,6 +815,13 @@ public class SemanticAcc {
         return s;
     }
 
+    /**
+     * Lista de parametros para la llamade de una función
+     * Al -> Al, E
+     * @param paramList
+     * @param expresion
+     * @return 
+     */
     static ParamList parmList(ParamList paramList, Expresion expresion) {
         ParamList p = new ParamList();
         p.code.addAll(paramList.code);
@@ -1016,6 +832,13 @@ public class SemanticAcc {
         p.lista.add(expresion.tipo);
         return p;
     }
+    
+    /**
+     * Parámetro de la llamada de una función.
+     * Al - > E 
+     * @param expresion
+     * @return 
+     */
     static ParamList parmList(Expresion expresion) {
         ParamList p = new ParamList();
         p.code.addAll(expresion.code);
@@ -1024,6 +847,13 @@ public class SemanticAcc {
         return p;
     }
 
+    /**
+     * Procesa la llamada de una función
+     * E -> id( Al )
+     * @param id String lexema de la función.
+     * @param params ParamList lista de parametros en la llamada
+     * @return Expresión valor de regreso de la función 
+     */
     static Expresion callFunc(String id, ParamList params) {
         Expresion e = new Expresion();
         Simbolo s = getSimboloFromID(id);
@@ -1040,7 +870,14 @@ public class SemanticAcc {
         
         return e;
     }
-
+    
+    /**
+     * Creación de un nuevo Entorno:
+     * Guarda la tabla de símbolos y tipos locales en sus respectivas listas de historial 
+     * Vacia las tablas locales.
+     * Agrega el contenido de las tablas globales en las nuevas tablas locales.
+     * 
+     */
     public static void nuevoEntorno() {
 //        System.out.println(tablaSimbolos);
 //        System.out.println(tablaSimbolosGlobal);
@@ -1062,7 +899,12 @@ public class SemanticAcc {
 //        System.out.println(tablaSimbolos);
 //        System.out.println(tablaSimbolosGlobal);        
     }
-
+    
+    /**
+     * Busca si un lexema es global
+     * @param arg
+     * @return 
+     */
     static boolean isGlobal(String arg) {
         for (Simbolo sim : tablaSimbolosGlobal) {
             if(sim.lexema.equals(arg)) return true;
@@ -1070,25 +912,37 @@ public class SemanticAcc {
         return false;
     }
 
+    /**
+     * 
+     */
     static void closeGlobal() {
         globalLock = true;
     }
     
+    /**
+     * Escribe los programas en codigo intermedio y en codigo Ensamblador
+     * @param sent
+     * @return 
+     */
     static boolean getProgram(Sentencia sent){
         CodeWriter codeWriter = new CodeWriter();
-        if(codeWriter.writeCode(file.getPath() + file.getName()+ ".inter", sent.code)){
+        if(codeWriter.writeCode(file.getPath() + ".inter", sent.code)){
            AssemblyCode asm = new AssemblyCode(sent.code);
            asm.setSimbolos(tablaSimbolosGlobal,oldSim,funcNames);
-           if(codeWriter.writeAssembly(file.getPath() + file.getName()+ ".asm", asm.getCode()))
+           if(codeWriter.writeAssembly(file.getPath() + ".asm", asm.getCode()))
                JOptionPane.showMessageDialog(null,"Traduccion exitosa !!!! ");
         }
         return true;
     }
-
+    
+    /**
+     * 
+     * @param file 
+     */
     static void setFile(File file) {
         SemanticAcc.file = file;
     }
-    public static File file;
+    
     
     
 }

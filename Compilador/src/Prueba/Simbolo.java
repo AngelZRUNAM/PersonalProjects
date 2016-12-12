@@ -12,10 +12,28 @@ import java.util.ArrayList;
  * @author ulises
  */
 class Simbolo {
+    /**
+     * Valor léxico del símbolo.
+     */
     String lexema;
+    /**
+     * Dirección en la tabla de símbolos  
+     */
     int dir;
+    /**
+     * Tipo de dato del símbolo
+     */
     int tipo;
+    /**
+     * Tipo de símbolo:
+     *  VARIABLE   -- 0 
+     *  PARAMETRO  -- 1
+     *  FUNCIÓN    -- 2
+     */
     int VarParFun;
+    /**
+     * Lista de Tipo 's de los parámetros si el símbolo es función
+     */
     ArrayList<Tipo> parameters = new ArrayList<>();
     
     int VARIABLE    = 0;
@@ -43,7 +61,13 @@ class Simbolo {
         else 
             return lexema + "\t" + dir + "\t" + tipo + "\t" + VarParFun ;
     }
-
+    /**
+     * Verifica si un objeto es del tipo ArrayList y en caso positivo,
+     * compara los valores de este array con los parámetros de la función en orden.
+     * @param obj Verfica si es un ArrayList de enteros con los tipos de los parámetros 
+     * de la función.
+     * @return 
+     */
     @Override
     public boolean equals(Object obj) {
         if( obj instanceof ArrayList ){

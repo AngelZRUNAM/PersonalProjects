@@ -7,7 +7,7 @@ package Prueba;
 
 /**
  *
- * @author ulises
+ * @author ulises - Miguel A. Zuñiga
  */
 public class Code {
     String code;
@@ -20,12 +20,12 @@ public class Code {
         this.indexLabel = index;
     }
     /**
-     * 
-     * @param code
-     * @param oper
-     * @param val1
-     * @param val2
-     * @param dest 
+     * Crea un objeto Codigo con todos los valores necesarios para crear un cuadruple
+     * @param code  : String con el codigo intermedio.
+     * @param oper  : String con el operador
+     * @param val1  : String con el argumento 1 
+     * @param val2  : String con el argumento 2
+     * @param dest  : String con el destino de la operación.
      */
     public Code(String code, String oper, String val1, String val2, String dest){
         this.code= code;

@@ -7,7 +7,7 @@ package Prueba;
 
 /**
  *
- * @author ulises
+ * @author ulises - Miguel A. Zuñiga
  */
 public class Type {
     int type;
@@ -17,7 +17,10 @@ public class Type {
         this.type = tipo;
         this.width = width;
     }
-    
+    /**
+     * Contructor de un tipo dependiendo del valor global establecido en Parser.java
+     * @param tipo Entero que representa el tipo. Ejemplo: Type(Parser.INT) 
+     */
     public Type(int tipo){
         switch(tipo){
             case Parser.INT: 

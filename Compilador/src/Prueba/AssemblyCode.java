@@ -14,13 +14,29 @@ import java.util.Hashtable;
  * @author Miguel A. Zuñiga
  */
 public class AssemblyCode {
+    /**
+     * Lista de código intermedio
+     */
     ArrayList<Code> code ;
+    /**
+     * Lista de String, alberga el codigo ensamblador
+     */
     ArrayList<String> assembly;
+    
     int ind = 0;
     String funcId = "";
     Hashtable<String, String> var;
+    /**
+     * Historico de tablas de de símbolos
+     */
     private ArrayList<ArrayList<Simbolo>> oldSim;
+    /**
+     * Lista de los nombres de las funciones declaradas en el programa
+     */
     private ArrayList<String> funcNames;
+    /**
+     * Tabla de símbolos globlaes
+     */
     private ArrayList<Simbolo> tablaSimbolosGlobal;
     
     
@@ -32,7 +48,11 @@ public class AssemblyCode {
         this();
         this.code = code;
     }
-    
+    /**
+     * Genera el código ensamblador del codigo intermedio que hay en 'code'
+     * utiliando las tablas de símbolos.
+     * @return Lista de String, código ensamblador
+     */
     ArrayList<String> getCode(){
         ArrayList<String> listCode = new ArrayList<>();
         Code c;
@@ -123,7 +143,12 @@ public class AssemblyCode {
         assembly.addAll(listCode);
         return assembly;
     }
-
+    
+    /**
+     * Escribe el codigo fuente de la instrucción 'inToFloat'
+     * @param cuad Cuadruple con la instrucción a traducir
+     * @return Lista de String, codigo ensamblador generado.
+     */
     private ArrayList<String> intToFloat(Cuadruple cuad) {
         ArrayList<String> listAux = new ArrayList<>();
         listAux.add("LD\tR0, " + isNumberGlobal(cuad.arg1) );
@@ -133,6 +158,13 @@ public class AssemblyCode {
         return listAux;
     }
     
+    /**
+     * Revisa si un argumento es una variable global, local/temporal o un número.
+     * @param arg String argumento a revisar
+     * @return Sí es global regresa el valor de argumento sin modificar
+     *          Sí es local/temporal regresa un direccionamiento indexado a la pila Ej. t1(SP)
+     *          Sí es número regresa el valor antecedido por '#' Ej. #4
+     */         
     private String isNumberGlobal(String arg){
         try{
             Integer.parseInt(arg);
@@ -146,13 +178,23 @@ public class AssemblyCode {
         }
     }
 
+    /**
+     * Obtiene el siguiente Code de la lista de codigo intermedio
+     * @return siguiente elemento de la lista Code, null si ya no hay mas elementos.
+     */    
     private Code nextCode() {
         if(ind<code.size())
          return code.get(ind++);
         else
          return null;   
     }
-
+    
+    /**
+     * Traduce una operación aritmetica.
+     * @param cuad Cuadruple de la operación
+     * @param oper Traducción de la operación Ej. '*' = 'MUL' 
+     * @return Lista de String, código traducido
+     */
     private ArrayList<String> opEnt(Cuadruple cuad, String oper) {
         ArrayList<String> listAux = new ArrayList<>();
         listAux.add("LD\tR0, " + isNumberGlobal(cuad.arg1));
@@ -162,6 +204,11 @@ public class AssemblyCode {
         return listAux;
     }
 
+    /**
+    * Traduce la operación de retorno
+    * @param cuad Cuadruple de la operación
+    * @return Lista de String, código de retorno en ensamblador
+    */     
     private ArrayList<String> ret(Cuadruple cuad) {
         ArrayList<String> list = new ArrayList<>();
         list.add("LD\tR0,"+isNumberGlobal(cuad.arg1));
@@ -169,7 +216,12 @@ public class AssemblyCode {
         list.add("BR\t*0(SP)");
         return list;
     }
-
+    
+    /**
+     * Traduce las asignaciones. ( '=' '+=' '-=' etc )
+     * @param cuad Cuadruple de la asignación
+     * @return List de String, código de la asignación
+     */
     private ArrayList<String> opAsig(Cuadruple cuad) {
         ArrayList<String> list = new ArrayList<>();
         if(cuad.arg1.contains(funcId)){
@@ -181,6 +233,11 @@ public class AssemblyCode {
         return list;
     }
 
+    /**
+     * Traduce la instrucción de parámetro
+     * @param cuad Cuadruple de la instrucción
+     * @return Lista de String, código de la insereción de parámetro en la pila
+     */
     private ArrayList<String> opParam(Cuadruple cuad) {
         ArrayList<String> list = new ArrayList<>();
         list.add("LD\tR0,"+isNumberGlobal(cuad.arg1));
@@ -188,6 +245,11 @@ public class AssemblyCode {
         return list;
     }
 
+    /**
+     * Traduce la llamada a una función
+     * @param cuad Cuadruple de la instrucción call
+     * @return Lista de String, código de las intrucciones para hacer una llamada a una subrutina 
+     */
     private ArrayList<String> opCall(Cuadruple cuad) {
         ArrayList<String> list = new ArrayList<>();
         list.add("ADD\tSP,SP,#TAM");
@@ -200,6 +262,11 @@ public class AssemblyCode {
         return list;
     }
 
+    /**
+     * Traduce la instrucción goto directo 
+     * @param cuad Cuadruple de la instrucción goto 
+     * @return Lista de String, código del salto incondicional.
+     */   
     private ArrayList<String> opGoto(Cuadruple cuad) {
         ArrayList<String> list = new ArrayList<>();
         if(cuad.arg1 == null){
@@ -211,6 +278,12 @@ public class AssemblyCode {
         return list;
     }
 
+    /**
+     * Introduce las instrocciones necesarias para los operadores relacionales,
+     * realiza un fetch del siguiente code con nextCode() para obtener la direccion de salto.
+     * @param cuad Cuadruple de la operación relacional. 
+     * @return Lista de String, código que representa una condicional con sus respectivos saltos.
+     */    
     private ArrayList<String> opRel(Cuadruple cuad) {
         ArrayList<String> list = new ArrayList<>();
         list.add("LD\tR0,"+isNumberGlobal(cuad.arg1));

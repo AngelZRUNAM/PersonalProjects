@@ -9,12 +9,22 @@ import java.util.ArrayList;
 
 /**
  *
- * @author ulises
+ * @author ulises - Miguel A. Zuñiga
  */
 public class Expresion {
+    /**
+     * Representante de la expresion, si no es un valor contiene el lexema de la variable
+     */
     String dir;
+    /**
+     * Tipo de la expresión segun la tabla de tipos.
+     */
     int tipo;
+    /**
+     * Lista que contiene el codigo intermedio de la función 
+     */
     ArrayList<Code> code;
+    
     Double value;
     int base;
     int width;
@@ -27,6 +37,10 @@ public class Expresion {
         this.code = code;
     }
     
+    /**
+     * Crea una Expresion con una ID obteniendo su tipo de la tabla, en caso contrario el programa arroja una excepcion.
+     * @param value : Lexema del símbolo 
+     */
     public Expresion(String value) {
         this.base = -1;
         int t = SemanticAcc.getTypeFromID(value);
@@ -35,15 +49,24 @@ public class Expresion {
         this.dir    = value;
         code = new ArrayList<>();
     }
+    
+    /**
+     * Crea una Expresion del tipo char 
+     * @param value
+     * @param tip 
+     */
     public Expresion(String value,String tip) {
         if(tip.equals("char")){
             this.base = -1;
             this.tipo   = 1;
             this.dir    = value.replace("'", "");
             code = new ArrayList<>();
-        }    
+        }   
     }
-    
+    /**
+     * Crea una Expresion desde un objeto Number
+     * @param value 
+     */
     public Expresion(Number value) {
         this.base = -1;
         code = new ArrayList<>();
